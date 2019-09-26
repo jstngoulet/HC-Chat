@@ -1,0 +1,38 @@
+{
+  "name": "HC-Chat",
+  "version": "0.0.1",
+  "summary": "HyreCar Chat Dependancy",
+  "description": "HyreCar Sendbird Caht Data Models, in charge of creating and accessing chats, updating channels and messages, and sending messages using the sendbird service. Removes all cache when a different userID is utilized.",
+  "homepage": "https://hyrecar-dev.gitlab.io/mobile-resources/site",
+  "license": {
+    "type": "MIT",
+    "file": "FILE_LICENSE"
+  },
+  "authors": {
+    "Tizzle Goulet": "jstngoulet@me.com"
+  },
+  "platforms": {
+    "ios": "11.0"
+  },
+  "source": {
+    "path": ""
+  },
+  "source_files": "Sources/Models",
+  "resource_bundles": {
+    "HC-Chat": [
+      "Sources/Models/*.xcdatamodeld"
+    ]
+  },
+  "frameworks": "UIKit",
+  "dependencies": {
+    "RxSwift": [
+      "~> 5.0.0"
+    ],
+    "RxCocoa": [
+      "~> 5.0.0"
+    ],
+    "SendBirdSDK": [
+      "~> 3.0.150"
+    ]
+  }
+}
