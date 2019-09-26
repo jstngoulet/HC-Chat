@@ -40,7 +40,7 @@ Pod::Spec.new do |spec|
   #
 
   #spec.license      = "MIT (example)"
-  spec.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+  spec.license      = { :type => "MIT", :file => "~/LICENSE" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -81,7 +81,7 @@ Pod::Spec.new do |spec|
   #
 
   #spec.source       = { :git => "http://EXAMPLE/HC-Chat.git", :tag => "#{spec.version}" }
-  spec.source = { :path => "" }
+  spec.source = { :git => "https://github.com/jstngoulet/HC-Chat.git", :branch => "master" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
