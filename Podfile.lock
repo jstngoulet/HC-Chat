@@ -12,7 +12,7 @@ PODS:
   - SendBirdSDK (3.0.150)
 
 DEPENDENCIES:
-  - HC-Chat (from `dependancies`)
+  - HC-Chat (from `./`)
   - RxCocoa
   - RxSwift
   - SendBirdSDK
@@ -26,15 +26,15 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   HC-Chat:
-    :path: dependancies
+    :path: "./"
 
 SPEC CHECKSUMS:
-  HC-Chat: 6f982d8aefb6b6b2cb30ad49421774e4ff3a836a
+  HC-Chat: b60251504693e0f70b9c961b1a3b828c7e12d02b
   RxCocoa: fcf32050ac00d801f34a7f71d5e8e7f23026dcd8
   RxRelay: 4f7409406a51a55cd88483f21ed898c234d60f18
   RxSwift: 8b0671caa829a763bbce7271095859121cbd895f
   SendBirdSDK: eaa0287bb4b81569c896f2da2ec5c8228c784435
 
-PODFILE CHECKSUM: 3145fd3fefda52524ef5f94634ebe9ea2c170bd2
+PODFILE CHECKSUM: c65122f8a7ab7f6826391a524cd15cc63da6addd
 
 COCOAPODS: 1.7.5

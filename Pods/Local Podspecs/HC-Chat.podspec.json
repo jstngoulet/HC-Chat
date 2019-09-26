@@ -6,7 +6,7 @@
   "homepage": "https://hyrecar-dev.gitlab.io/mobile-resources/site",
   "license": {
     "type": "MIT",
-    "file": "FILE_LICENSE"
+    "file": "LICENSE"
   },
   "authors": {
     "Tizzle Goulet": "jstngoulet@me.com"
@@ -15,12 +15,12 @@
     "ios": "11.0"
   },
   "source": {
-    "path": ""
+    "git": "https://github.com/jstngoulet/HC-Chat.git"
   },
-  "source_files": "Sources/Models",
+  "source_files": "HC-Chat/Sources/Models",
   "resource_bundles": {
     "HC-Chat": [
-      "Sources/Models/*.xcdatamodeld"
+      "HC-Chat/Sources/Models/*.xcdatamodeld"
     ]
   },
   "frameworks": "UIKit",
@@ -34,5 +34,7 @@
     "SendBirdSDK": [
       "~> 3.0.150"
     ]
-  }
+  },
+  "swift_versions": "5.1",
+  "swift_version": "5.1"
 }

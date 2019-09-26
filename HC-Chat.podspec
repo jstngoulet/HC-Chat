@@ -40,7 +40,7 @@ Pod::Spec.new do |spec|
   #
 
   #spec.license      = "MIT (example)"
-  spec.license      = { :type => "MIT", :file => "~/LICENSE" }
+  spec.license      = { :type => "MIT", :file => "LICENSE" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -81,7 +81,7 @@ Pod::Spec.new do |spec|
   #
 
   #spec.source       = { :git => "http://EXAMPLE/HC-Chat.git", :tag => "#{spec.version}" }
-  spec.source = { :git => "https://github.com/jstngoulet/HC-Chat.git", :branch => "master" }
+  spec.source = { :git => "https://github.com/jstngoulet/HC-Chat.git" :commit => "" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -92,7 +92,7 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = "Sources/Models"
+  spec.source_files  = "HC-Chat/Sources/Models"
   #spec.exclude_files = "Classes/Exclude"
 
   # spec.public_header_files = "Classes/**/*.h"
@@ -110,7 +110,7 @@ Pod::Spec.new do |spec|
   # spec.resources = "Resources/*.png"
 
   # spec.preserve_paths = "FilesToSave", "MoreFilesToSave"
-  spec.resource_bundles = {'HC-Chat' => ['Sources/Models/*.xcdatamodeld']}
+  spec.resource_bundles = {'HC-Chat' => ['HC-Chat/Sources/Models/*.xcdatamodeld']}
 
 
   # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
