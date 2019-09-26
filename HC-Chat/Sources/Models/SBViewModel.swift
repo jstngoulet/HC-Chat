@@ -14,6 +14,15 @@ import RxSwift
 typealias ChannelsCompletion = (([ChannelModel]?, [MessageModel]?) -> Void)?
 
 open class SBViewModel: RxSBModel {
+
+    enum SBViewModelError: Error {
+        case noMessages
+        case queryNotCreated
+        case noMessageSent
+        case noChannelsFound
+        case newChannelCreatedNotFound
+        case notConnected
+    }
     
     /// Teh Sendbird API Key to use in this application
     public static var SBDAPIKey: String? {
@@ -130,19 +139,26 @@ open class SBViewModel: RxSBModel {
     /// - Parameters:
     ///   - channel: The channel that we are searching the messages for
     ///   - completion: The completion block, containing the found messages, converted to our local model
-    public class func getMessages(forChannel channel: ChannelModel, then completion: (([MessageModel]?) -> Void)?) {
+    public class func getMessages(forChannel channel: ChannelModel, then completion: ((Result<[MessageModel], Error>) -> Void)?) {
         guard let sbChannel = SBDChannels.first(where: { (sbChannelWatch) -> Bool in
             return sbChannelWatch.channelUrl == channel.channelID
         }), let messageQuery = sbChannel.createPreviousMessageListQuery()
-            else { completion?(nil); return }
+            else {
+                completion?(.failure(SBViewModelError.queryNotCreated))
+                return
+        }
         messageQuery.limit = 100
         messageQuery.load { (messages, error) in
-            if let erorrFound = error {
-                print("Error Found on message query: \(erorrFound)")
+            if let errorFound = error {
+                completion?(.failure(errorFound))
                 return
             }
-            guard let messagesFound = messages else { completion?(nil); return }
-            completion?(messagesFound.compactMap({ return MessageModel(withSBDMessage: $0) }))
+            guard let messagesFound = messages
+                else {
+                    completion?(.failure(SBViewModelError.noMessages))
+                    return
+            }
+            completion?(.success(messagesFound.compactMap({ return MessageModel(withSBDMessage: $0) })))
         }
     }
     
@@ -151,40 +167,28 @@ open class SBViewModel: RxSBModel {
     /// - Parameters:
     ///   - textMessage:    The Text message we are sending
     ///   - inChannel:      The Channel we are sending the message to
-    class func send(textMessage: String, inChannel channel: ChannelModel, then completion: ((MessageModel?) -> Void)?) {
+    class func send(textMessage: String, inChannel channel: ChannelModel, then completion: ((Result<MessageModel, Error>) -> Void)?) {
         
         guard let sbChannel = SBDChannels.first(where: { (sbChannelWatch) -> Bool in
             return sbChannelWatch.channelUrl == channel.channelID
         }) else {
-            print("No Channels were found")
+            completion?(.failure(SBViewModelError.noChannelsFound))
             return
         }
         
         sbChannel.sendUserMessage(textMessage) { (userMessageSent, error) in
             if let errorFound = error {
                 //  Add a message to the beginning, informing the user it did not send
-                print("error found on send: \(errorFound)")
-                completion?(nil)
+                completion?(.failure(errorFound))
                 return
             }
             guard let messageSent = userMessageSent else {
-                print("Could not find user message sent")
+                completion?(.failure(SBViewModelError.noMessageSent))
                 return
             }
-            let messageSentSuc = MessageModel(withSBDMessage: messageSent)
-            completion?(messageSentSuc)
-            
-            //  Report the chat message as being sent
-            AppManager.shared.reportAnalytic(
-                event: .userSentMessage,
-                dict:
-                [
-                    "channelID": messageSentSuc.channelURL as AnyObject,
-                    "senderID": messageSentSuc.sentByUserID as AnyObject,
-                    "senderName": messageSentSuc.shownUserName as AnyObject,
-                    "service": "Sendbird" as AnyObject
-                ]
-            )
+
+            //  Return with the new message, if available
+            completion?(.success(MessageModel(withSBDMessage: messageSent)))
         }
     }
     
@@ -193,14 +197,20 @@ open class SBViewModel: RxSBModel {
     /// - Parameters:
     ///   - userID:         User ID to start the channel with
     ///   - completion:     The action to perform when the channel is created. Returns channel if available
-    public class func createChannelWith(userID: String, then completion: @escaping ((ChannelModel?) -> Void)) {
+    public class func createChannelWith(userID: String, then completion: @escaping ((Result<ChannelModel, Error>) -> Void)) {
         
         //  We need to first determine if there is already a channel that exists.
         //  If there is, we just need to return it
         if let channelFound = currentChannels.value.first(where: { $0.userIDs.contains(userID) }) {
             //  Channel found, return it
-            completion(channelFound)
+            completion(.success(channelFound))
             return
+        }
+
+        guard let user = currentUser
+            else {
+                completion(.failure(SBViewModelError.notConnected))
+                return
         }
         
         //  Else, no channel found, so we need to create one
@@ -209,63 +219,33 @@ open class SBViewModel: RxSBModel {
         //  Add the current user owner ID and the other user ID
         channelParams.addUserIds(
             [
-                user.value.ownerID,
+                user.userId,
                 userID
             ]
         )
         
         //  Set the channel name
-        channelParams.name = user.value.ownerID + " ~> " + userID
+        channelParams.name = user.userId + " ~> " + userID
         channelParams.isDistinct = true
         
         //  Now, create the new channel
         SBDGroupChannel.createChannel(with: channelParams) { (createdChannel, error) in
             if let errorFound = error {
-                //  Report the error to analytics
-                let localError = errorFound as NSError
-                AppManager.shared.reportAnalytic(
-                    event: .sendbirdChannelCreatedError,
-                    dict:
-                    [
-                        "isAuthError": errorFound.a0_isAuthenticationError as AnyObject,
-                        "isManagementError": errorFound.a0_isManagementError as AnyObject,
-                        "error": localError.localizedDescription as AnyObject,
-                        "code": localError.code as AnyObject
-                    ]
-                )
-                completion(nil)
+                completion(.failure(errorFound))
                 return
             }
             
             guard let foundChannel = createdChannel else {
-                //  Report the error to analytics
-                AppManager.shared.reportAnalytic(
-                    event: .sendbirdChannelCreatedError,
-                    dict:
-                    [
-                        "error": "Channel was created but not found" as AnyObject
-                    ]
-                )
-                completion(nil)
+                completion(.failure(SBViewModelError.newChannelCreatedNotFound))
                 return
             }
             
             //  Report to analytics
             let localChannel = ChannelModel(withSendbirdChannel: foundChannel)
             addNew(sbChannel: foundChannel)
-            AppManager.shared.reportAnalytic(
-                event: .sendbirdChannelCreated,
-                dict:
-                [
-                    "fromOwnerID": user.value.ownerID as AnyObject,
-                    "toDriverID": userID as AnyObject,
-                    "channelID": localChannel.channelID as AnyObject,
-                    "channelName": localChannel.channelName as AnyObject
-                ]
-            )
             
             //  Return the new channel
-            completion(localChannel)
+            completion(.success(localChannel))
         }
     }
 }
@@ -311,18 +291,6 @@ extension SBViewModel: SBDChannelDelegate {
             currentChannels.append(ChannelModel(withSendbirdChannel: sender))
             currentMessages.append(MessageModel(withSBDMessage: message))
         }
-        
-        //  Report the analytic event
-        AppManager.shared.reportAnalytic(
-            event: .userReceivedMessage,
-            dict:
-            [
-                "channelID": sender.channelUrl as AnyObject,
-                "senderID": newMessage.sentByUserID as AnyObject,
-                "senderName": newMessage.shownUserName as AnyObject,
-                "service": "Sendbird" as AnyObject
-            ]
-        )
 
         //  Ensure the channels and messages are updated
         SBViewModel.currentMessages.accept(currentMessages)

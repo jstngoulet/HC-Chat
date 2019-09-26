@@ -81,7 +81,7 @@ Pod::Spec.new do |spec|
   #
 
   #spec.source       = { :git => "http://EXAMPLE/HC-Chat.git", :tag => "#{spec.version}" }
-  spec.source = { :git => "https://github.com/jstngoulet/HC-Chat.git", :tag => "0.0.1" }
+  spec.source = { :git => "https://github.com/jstngoulet/HC-Chat.git" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
