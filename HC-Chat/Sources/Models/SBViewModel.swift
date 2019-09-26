@@ -167,7 +167,7 @@ open class SBViewModel: RxSBModel {
     /// - Parameters:
     ///   - textMessage:    The Text message we are sending
     ///   - inChannel:      The Channel we are sending the message to
-    class func send(textMessage: String, inChannel channel: ChannelModel, then completion: ((Result<MessageModel, Error>) -> Void)?) {
+    public class func send(textMessage: String, inChannel channel: ChannelModel, then completion: ((Result<MessageModel, Error>) -> Void)?) {
         
         guard let sbChannel = SBDChannels.first(where: { (sbChannelWatch) -> Bool in
             return sbChannelWatch.channelUrl == channel.channelID

@@ -14,19 +14,19 @@ import CoreData
 
 open class ChannelModel: RxSBModel {
     
-    var channelID: String {
+    open var channelID: String {
         get { return currentChannelManagedObject?.value(forKey: CoreDataKeys.channelID.rawValue) as? String ?? "" }
         set { currentChannelManagedObject?.setValue(newValue, forKey: CoreDataKeys.channelID.rawValue) }
     }
-    var channelMessages: BehaviorRelay<[MessageModel]> = BehaviorRelay(value: [])
-    var lastMessage: BehaviorRelay<MessageModel?> = BehaviorRelay(value: nil)
-    var channelName: String {
+    open var channelMessages: BehaviorRelay<[MessageModel]> = BehaviorRelay(value: [])
+    open var lastMessage: BehaviorRelay<MessageModel?> = BehaviorRelay(value: nil)
+    open var channelName: String {
         get { return currentChannelManagedObject?.value(forKey: CoreDataKeys.channelName.rawValue) as? String ?? "Unknown Channel" }
         set { currentChannelManagedObject?.setValue(newValue, forKey: CoreDataKeys.channelName.rawValue)}
     }
-    var userIDs: [String] = []
-    var unreadCount: Int = 0
-    var channelImageURLString: String {
+    open var userIDs: [String] = []
+    open var unreadCount: Int = 0
+    open var channelImageURLString: String {
         get { return currentChannelManagedObject?.value(forKey: CoreDataKeys.channelImageURLString.rawValue) as? String ?? "" }
         set { currentChannelManagedObject?.setValue(newValue, forKey: CoreDataKeys.channelImageURLString.rawValue)}
     }
@@ -52,7 +52,7 @@ open class ChannelModel: RxSBModel {
     }
 
     /// The other members in this channel. Only available on group channels, empty otherwise
-    var otherMembers: [SBDMember] = [] {
+    open var otherMembers: [SBDMember] = [] {
         didSet {
             if otherMembers.isEmpty { return }
             self.channelName = self.displayName
@@ -64,7 +64,7 @@ open class ChannelModel: RxSBModel {
     /// • If there is one member, we get the nickname of that member
     ///     • If the nickname is not found, they are guest
     /// • If there is more than one member, we create a list of all members in the channel
-    var displayName: String {
+    open var displayName: String {
         return (otherMembers.isEmpty
             ? channelName
             : otherMembers.count == 1
