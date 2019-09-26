@@ -10,41 +10,60 @@ import Foundation
 import SendBirdSDK
 import CoreData
 
+/// The model for the messages that are sent through sendbird.
+/// This class can also be used other places as it pertains to any cahced model that may exist for a message.
 open class MessageModel: RxSBModel {
-    
-    var shownImageURLString: String {
+
+    /// The image URL string that represents the user that sent the message
+    open var shownImageURLString: String {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.shownImageURLString.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.shownImageURLString.rawValue) as? String ?? "https://cdn1.iconfinder.com/data/icons/materia-human/24/013_003_account_profile_circle-512.png" }
     }
-    var shownUserName: String {
+
+    /// The Shown user name, of whom sent the message
+    open var shownUserName: String {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.shownUserName.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.shownUserName.rawValue) as? String ?? "" }
     }
-    var messageDate: Date {
+
+    /// The date the message was sent
+    open var messageDate: Date {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.messageDate.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.messageDate.rawValue) as? Date ?? Date.distantPast }
     }
-    var messageText: String {
+
+    /// The message text that should be displayed
+    open var messageText: String {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.messageText.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.messageText.rawValue) as? String ?? "No Message Was Found" }
     }
-    var isRead: Bool {
+
+    /// Whether or not the current message has been read
+    open var isRead: Bool {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.isRead.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.isRead.rawValue) as? Bool ?? false }
     }
-    var channelURL: String {
+
+    /// The patent channel's ID
+    open var channelURL: String {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.channelID.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: ChannelModel.CoreDataKeys.channelID.rawValue) as? String ?? "" }
     }
-    var messageID: String {
+
+    /// The message ID, used to find the message and to perform additional actions
+    open var messageID: String {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.messageID.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.messageID.rawValue) as? String ?? "" }
     }
-    var wasSentByCurrentUser: Bool {
+
+    /// A boolean that shows if the user ID of the message was the same as the current user. This value is stored.
+    open var wasSentByCurrentUser: Bool {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.wasSentByCurrentUser.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.wasSentByCurrentUser.rawValue) as? Bool ?? false }
     }
-    var sentByUserID: String {
+
+    /// The User ID of whom sent the message
+    open var sentByUserID: String {
         set { currentMessageManagedObject?.setValue(newValue, forKey: CoreDataKeys.sentByUserID.rawValue) }
         get { return currentMessageManagedObject?.value(forKey: CoreDataKeys.sentByUserID.rawValue) as? String ?? "" }
     }

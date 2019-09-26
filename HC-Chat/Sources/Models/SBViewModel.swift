@@ -11,8 +11,12 @@ import SendBirdSDK
 import RxCocoa
 import RxSwift
 
-typealias ChannelsCompletion = (([ChannelModel]?, [MessageModel]?) -> Void)?
+/*
+ The primary view model for the Sendbird Integration
+ This class manages the connection to the Sendbird application, using the `SBDAPIKey` variable, which when set, initializes the application, the connection of the user, and the fetching of channels, when the user is signed in.
 
+ Note that a user must be signed in before fetching any channels
+ */
 open class SBViewModel: RxSBModel {
 
     enum SBViewModelError: Error {
@@ -58,27 +62,31 @@ open class SBViewModel: RxSBModel {
     /// Connects the user ID to the SendBird Chat. Disconnects if the user is already connected
     ///
     /// - Parameter userID: The UserID that is signed in
-    public class func connect(userID: String) {
+    public class func connect(userID: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         guard SBDMain.getCurrentUser() != nil else {
             //  Connect the user
             SBDMain.connect(withUserId: userID) { (_, err) in
                 if let foundError = err {
-                    print("Err: \(foundError.debugDescription)")
+                    completion(.failure(foundError))
                     return
                 }
                 SBViewModel.isLoggedIn.accept(true)
 
                 //  Start Listening for messages
                 SBDMain.add(SBViewModel.shared as SBDChannelDelegate, identifier: "com.hyrecar.ios.rxsbchat.channel.delegate")
+
+                //  Submit the success.
+                //  Note that the `isLoggedIn` value is set before this action completes, so be aware of any duplicate actions that may occur when observing the value
+                completion(.success(true))
             }
             return
         }
         //  Disconnect the user, then recursively call this function to sign back in
-        disconnect(userIDToReconnect: userID)
+        disconnect(userIDToReconnect: userID, completion: completion)
     }
     
     /// Disconnect the current user from Sendbird
-    public class func disconnect(userIDToReconnect: String? = nil) {
+    public class func disconnect(userIDToReconnect: String? = nil, completion: @escaping (Result<Bool, Error>) -> Void) {
         SBDMain.disconnect {
             SBViewModel.isLoggedIn.accept(false)
             SBDMain.removeChannelDelegate(forIdentifier: "com.hyrecar.ios.rxsbchat.channel.delegate")
@@ -89,11 +97,16 @@ open class SBViewModel: RxSBModel {
             }
 
             if let userID = userIDToReconnect {
-                connect(userID: userID)
+                connect(userID: userID, completion: completion)
+            } else {
+                //  Just confirm the user was logged out
+                completion(.success(true))
             }
         }
     }
-    
+
+    /// Adds a new SB Channel to the list of channels. This usually occurs when a channel is created, so we do not need to fetch again
+    /// - Parameter sbChannel: The created sb channel
     private class func addNew(sbChannel: SBDBaseChannel) {
         SBDChannels.append(sbChannel)
     }
