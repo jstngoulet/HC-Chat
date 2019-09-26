@@ -92,7 +92,7 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = "HC-Chat"
+  spec.source_files  = "HC-Chat/Classes/Models"
   #spec.exclude_files = "Classes/Exclude"
 
   # spec.public_header_files = "Classes/**/*.h"
@@ -110,7 +110,8 @@ Pod::Spec.new do |spec|
   # spec.resources = "Resources/*.png"
 
   # spec.preserve_paths = "FilesToSave", "MoreFilesToSave"
-  spec.resource_bundles = {'HC-Chat' => ['HC-Chat/Sources/Models/*.xcdatamodeld']}
+  #spec.preserve_paths = "Classes", "Models"
+  spec.resource_bundles = {'HC-Chat' => ['HC-Chat/Classes/Models/*.xcdatamodeld']}
 
 
   # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
